@@ -1,4 +1,3 @@
-from pygtail import Pygtail
 import time
 import logEntry
 
