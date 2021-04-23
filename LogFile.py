@@ -3,7 +3,7 @@ from LogEntry import LogEntry, Status
 
 
 def follow(thefile):
-    thefile.seek(0, 2)
+    #thefile.seek(0, 2)
     while True:
         line = thefile.readline()
         if not line:
@@ -18,7 +18,7 @@ class LogFile:
     warningLogs = []
     errorLogs = []
 
-    def __init__(self, filepath="mock_data.clf"):
+    def __init__(self, filepath="mock_data.txt"):
         self.filepath = filepath
 
     def get_error_logs(self):
@@ -32,7 +32,7 @@ class LogFile:
         with open(self.filepath, 'r') as f:
             for line in follow(f):
                 if line:
-                    newLog = LogEntry(len(self.logEntries), line)
+                    newLog = LogEntry(len(self.logEntries), line.strip())
                     if newLog.status == Status.WARN:
                         self.warningLogs.append(len(self.logEntries))
                     elif newLog.status == Status.ERROR:
