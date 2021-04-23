@@ -2,16 +2,6 @@ import time
 from LogEntry import LogEntry, Status
 
 
-def follow(thefile):
-    #thefile.seek(0, 2)
-    while True:
-        line = thefile.readline()
-        if not line:
-            time.sleep(0.1)
-            continue
-        yield line
-
-
 class LogFile:
 
     logEntries = []
@@ -19,7 +9,7 @@ class LogFile:
     errorLogs = []
 
     def __init__(self, filepath="mock_data.txt"):
-        self.filepath = filepath
+        self.filepath = filepath  # this is just a string
 
     def get_error_logs(self):
         return [self.logEntries[i] for i in self.errorLogs]
@@ -27,10 +17,18 @@ class LogFile:
     def get_warning_logs(self):
         return [self.logEntries[i] for i in self.warningLogs]
 
+    def _follow(self, file):
+        while True:
+            line = file.readline()
+            if not line:
+                time.sleep(0.1)
+                continue
+            yield line
+
     def monitor_file(self):
 
         with open(self.filepath, 'r') as f:
-            for line in follow(f):
+            for line in self._follow(f):
                 if line:
                     newLog = LogEntry(len(self.logEntries), line.strip())
                     if newLog.status == Status.WARN:
