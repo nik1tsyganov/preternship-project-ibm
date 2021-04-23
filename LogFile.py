@@ -1,5 +1,5 @@
 import time
-import logEntry
+from LogEntry import LogEntry, Status
 
 
 def follow(thefile):
@@ -29,18 +29,13 @@ class LogFile:
 
     def monitor_file(self):
 
-        index = 0
         with open(self.filepath, 'r') as f:
             for line in follow(f):
                 if line:
-                    newlog = logEntry.process(line.strip(), index)
-                    if newlog.status == 'OK':
-                        self.logEntries.append(newlog)
-                    elif newlog.status == 'Warn':
-                        self.warningLogs.append(newlog)
-                        self.logEntries.append(newlog)
-                    else:
-                        self.errorLogs.append(newlog)
-                        self.logEntries.append(newlog)
+                    newLog = LogEntry(len(self.logEntries), line)
+                    if newLog.status == Status.WARN:
+                        self.warningLogs.append(len(self.logEntries))
+                    elif newLog.status == Status.ERROR:
+                        self.errorLogs.append(len(self.logEntries))
 
-                    index += 1
+                    self.logEntries.append(newLog)
