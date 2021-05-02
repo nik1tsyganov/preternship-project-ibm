@@ -10,7 +10,7 @@ import threading
 
 
 def handle_data(logEntries, errorLogs, warningLogs):
-    #print(list(map(lambda x: x.data, logEntries)))
+    print(list(map(lambda x: x.data, logEntries)))
     print(list(map(lambda x: x.data, warningLogs)))
     print(list(map(lambda x: x.data, errorLogs)))
 
