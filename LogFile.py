@@ -12,7 +12,7 @@ class Type(Enum):
     SYSSTAT = Sysstat
     PRIME = Primeradiant
     QA1080TI = QA
-    UNKNOWN = LogEntry
+    UNKNOWN = Sysstat
 
 
 class LogFile:
@@ -22,7 +22,7 @@ class LogFile:
     errorLogs = []
     fileType = Type.UNKNOWN
 
-    def __init__(self, filepath="mock_data.txt"):
+    def __init__(self, filepath):
         self.filepath = filepath  # this is just a string
         self._type_of_file()
 
@@ -54,7 +54,7 @@ class LogFile:
         elif re.match(r"[a-f0-9]{2};[0-9a-f]{3}", topOfFile):
             self.fileType = Type.QA1080TI
         else:
-            self.fileType = Type.UNKNOWN
+            self.fileType = Type.SYSSTAT
 
         print(self.fileType)
 
@@ -79,14 +79,12 @@ class LogFile:
                         elif self.fileType == Type.QA1080TI:
                             newLog = QA(len(self.logEntries), line.strip("\n").lower())
                         else:
-                            newLog = LogEntry(len(self.logEntries), line.strip("\n").lower())
+                            newLog = Sysstat(len(self.logEntries), line.strip("\n").lower())
 
                     if newLog.status == Status.WARN:
                         self.warningLogs.append(len(self.logEntries))
-                        print("Found warning")
                     elif newLog.status == Status.ERROR:
                         self.errorLogs.append(len(self.logEntries))
-                        print("Found error")
 
                     self.logEntries.append(newLog)
                     sleep_counter = 0

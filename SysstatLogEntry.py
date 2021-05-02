@@ -6,7 +6,7 @@ class Sysstat(LogEntry):
 
     errorRegex = re.compile(r"^\s*err(or)?\s*")
     warnRegex = re.compile(r"^\s*warn(ing)?\s*")
-    okRegex = re.compile(r"^\s*i(nfo)?\s*")
+    okRegex = re.compile(r"^\s*info(rmation)?\s*")
 
     def __init__(self, index, data):
         LogEntry.__init__(self, index, data)

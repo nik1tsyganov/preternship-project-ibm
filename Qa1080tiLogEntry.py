@@ -4,9 +4,6 @@ from LogEntry import LogEntry, Status
 
 class QA(LogEntry):
 
-    errorRegex = re.compile(r"\s*err(or)?|fail(ure|ed)?\s*")
-    warnRegex = re.compile(r"\s*warn(ing)?\s*")
-
     def __init__(self, index, data):
         LogEntry.__init__(self, index, data)
 
@@ -16,13 +13,11 @@ class QA(LogEntry):
 
     def process(self):
 
-        if self.errorRegex.match(self.data):
+        if re.search(r"\s*err(or)?|fail(ure|ed)?\s*", self.data):
             self.status = Status.ERROR
-        elif self.warnRegex.match(self.data):
+        elif re.search(r"\s*warn(ing)?\s*", self.data):
             self.status = Status.WARN
-        elif self.okRegex.match(self.data):
-            self.status = Status.OK
         else:
-            self.status = Status.UNKNOWN
+            self.status = Status.OK
 
         return self.status
