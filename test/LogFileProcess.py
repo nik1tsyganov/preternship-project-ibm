@@ -1,13 +1,19 @@
 import sys
-
 sys.path.append('..')
 from LogFile import LogFile
-from DataStreamSimulation import data_stream
+from Utilities import data_stream
 import threading
 
-streamSimulation = threading.Thread(name="Mock Data Stream", target=data_stream, args=('mock_data.txt', 'stream_data.txt'))
-streamSimulation.start()
+#streamSimulation = threading.Thread(name="Mock Data Stream", target=data_stream, args=('../Data/sysstat_all.log',
+#                                                                                       'stream_data.txt'))
+#streamSimulation.start()
 
 
-mockLogFile = LogFile("stream_data.txt")
-mockLogFile.monitor_file()
+def handle_data(logEntries, errorLogs, warningLogs):
+    #print(list(map(lambda x: x.data, logEntries)))
+    print(list(map(lambda x: x.data, warningLogs)))
+    print(list(map(lambda x: x.data, errorLogs)))
+
+
+mockLogFile = LogFile("../Data/primeradiant02_2021_03_24_copy.txt")
+mockLogFile.monitor_file(handle_data)
