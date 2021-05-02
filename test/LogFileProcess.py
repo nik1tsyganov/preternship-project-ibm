@@ -15,5 +15,5 @@ def handle_data(logEntries, errorLogs, warningLogs):
     print(list(map(lambda x: x.data, errorLogs)))
 
 
-mockLogFile = LogFile("../Data/primeradiant02_2021_03_24_copy.txt")
+mockLogFile = LogFile("../Data/primeradiant02_2021_03_24.log")
 mockLogFile.monitor_file(handle_data)

@@ -68,10 +68,18 @@ class LogFile:
                     callback(self.logEntries, self.get_error_logs(), self.get_warning_logs())
 
                 if line:
-                    if self.fileType.value.belongs_prev(line):
+                    if Sysstat.belongs_prev(line) and self.fileType == Type.SYSSTAT:
                         newLog.data = newLog.data + " " + line.strip()
+
                     else:
-                        newLog = self.fileType.value(len(self.logEntries), line.strip("\n").lower())
+                        if self.fileType == Type.SYSSTAT:
+                            newLog = Sysstat(len(self.logEntries), line.strip("\n").lower())
+                        elif self.fileType == Type.PRIME:
+                            newLog = Primeradiant(len(self.logEntries), line.strip("\n").lower())
+                        elif self.fileType == Type.QA1080TI:
+                            newLog = QA(len(self.logEntries), line.strip("\n").lower())
+                        else:
+                            newLog = LogEntry(len(self.logEntries), line.strip("\n").lower())
 
                     if newLog.status == Status.WARN:
                         self.warningLogs.append(len(self.logEntries))
