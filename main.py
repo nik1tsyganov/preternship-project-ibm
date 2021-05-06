@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 import concurrent.futures
-import multiprocessing
-from multiprocessing import Process, Pool, Lock
-import random
 import os
 import time
 import sys
@@ -12,7 +9,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import pandas as pd
-
 from dash.dependencies import Input, Output
 from LogFile import LogFile
 
@@ -136,7 +132,6 @@ def main():
         return fig
 
     app.run_server(debug=True)
-
 
 # Main Execution
 
