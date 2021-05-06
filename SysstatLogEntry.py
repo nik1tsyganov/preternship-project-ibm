@@ -17,11 +17,13 @@ class Sysstat(LogEntry):
 
     def process(self):
 
-        if self.errorRegex.match(self.data):
+        temp = self.data.strip("\n").lower()
+
+        if self.errorRegex.match(temp):
             self.status = Status.ERROR
-        elif self.warnRegex.match(self.data):
+        elif self.warnRegex.match(temp):
             self.status = Status.WARN
-        elif self.okRegex.match(self.data):
+        elif self.okRegex.match(temp):
             self.status = Status.OK
         else:
             self.status = Status.UNKNOWN

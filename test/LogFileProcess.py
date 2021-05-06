@@ -10,10 +10,11 @@ import threading
 
 
 def handle_data(logEntries, errorLogs, warningLogs):
-    print(list(map(lambda x: x.data, logEntries)))
-    print(list(map(lambda x: x.data, warningLogs)))
-    print(list(map(lambda x: x.data, errorLogs)))
+    #print(list(map(lambda x: x.data, logEntries)))
+    #print(list(map(lambda x: x.data, warningLogs)))
+    for qa in errorLogs:
+        print(qa.data.strip("\n"))
 
 
-mockLogFile = LogFile("../Data/primeradiant02_2021_03_24.log")
+mockLogFile = LogFile("../Data/qa-1080ti-003.log")
 mockLogFile.monitor_file(handle_data)
