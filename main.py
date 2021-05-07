@@ -7,11 +7,14 @@ import sys
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
 import plotly.express as px
 import pandas as pd
+
 from dash.dependencies import Input, Output
 from LogFile import LogFile
 
+# Dash setup
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -55,7 +58,6 @@ def logFileFactory(filename):
 
 
 def main():
-
     arguments = sys.argv[1:]
     cores = 1
     files = []
@@ -104,7 +106,23 @@ def main():
             Testing how logs are being graphed.
         '''),
 
-        dcc.Graph(id='log-file-data')
+        dcc.Graph(id='log-file-data'),
+
+        html.P(children='''
+            Pie Chart
+        '''),
+
+        dcc.Graph(id='log-pie-chart'),
+
+        html.P(children='''
+            Display table of error and warning logs.
+        '''),
+
+        dash_table.DataTable(
+            id='table-virtualization',
+            data=[],
+            page_action='none'
+        )
     ])
 
     @app.callback(
@@ -114,16 +132,14 @@ def main():
         data = dataDict[selected_file]
 
         df = pd.DataFrame({
-            "Log Status": ["OK", "Error", "Warning"],
-            "# of Logs": [(len(data.logEntries) -
-                           len(data.errorLogs) - len(data.warningLogs)),
-                          len(data.errorLogs),
+            "Log Status": ["Error", "Warning"],
+            "# of Logs": [len(data.errorLogs),
                           len(data.warningLogs)],
-            "Status": ["OK", "Error", "Warning"]
+            "Status": ["Error", "Warning"]
         })
 
         fig = px.bar(df,
-                     title=selected_file,
+                     title="Bar Graph Distribution of Error and Warning Logs",
                      x="Log Status",
                      y="# of Logs",
                      color="Status",
@@ -131,10 +147,49 @@ def main():
 
         return fig
 
+    @app.callback(
+        Output('log-pie-chart', 'figure'),
+        Input('file-choice', 'value'))
+    def update_figure(selected_file):
+        data = dataDict[selected_file]
+
+        df = pd.DataFrame({
+            "Log Status": ["Error", "Warning"],
+            "# of Logs": [len(data.errorLogs), len(data.warningLogs)]
+        })
+
+        fig = px.pie(df,
+                     title="Pie Chart Distribution of Error and Warning Logs",
+                     values="# of Logs",
+                     names="Log Status")
+
+        return fig
+
+    @app.callback(
+        [Output("table-virtualization", "data")],
+        [Input('file-choice', 'value')])
+    def updateTable(selected_file):
+
+        dataError = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_error_logs())]
+        # dataWarning = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_warning_logs())]
+        # data = [dataError, dataWarning]
+        tblrows = dataError.to_dict('columns'),
+        tblcols = [{'name': i, 'id': i} for i in data.columns],
+
+        table = dct.DataTable(
+            id='live-table',
+            data=tblrows,
+            columns=tblcols,
+            style_cell={'textAlign': 'center', 'min-width': '50px'}
+        )
+
+
+
+
     app.run_server(debug=True)
 
-# Main Execution
 
+# Main Execution
 if __name__ == '__main__':
     main()
 
