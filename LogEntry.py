@@ -11,7 +11,6 @@ class Status(Enum):
 
 
 class LogEntry(ABC):
-
     status = Status.UNKNOWN
 
     def __init__(self, index, data):

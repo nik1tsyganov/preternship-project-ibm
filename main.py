@@ -2,12 +2,12 @@
 
 import concurrent.futures
 import os
-import time
 import sys
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
+from LogEntry import Status
 import plotly.express as px
 import pandas as pd
 
@@ -45,15 +45,9 @@ def usage(exit_code=0):
     sys.exit(exit_code)
 
 
-def callback(logs, errors, warnings, filename):
-    print(f"Saving {len(logs)} logs to {filename}")
-    curr = Data(logs, errors, warnings)
-    return curr
-
-
 def logFileFactory(filename):
     tmp = LogFile(filename)
-    logs, errors, warnings = tmp.monitor_file(callback)
+    logs, errors, warnings = tmp.monitor_file()
     return Data(logs, errors, warnings)
 
 
@@ -88,40 +82,52 @@ def main():
         for i in range(cores):
             dataDict[files[i]] = store[i]
 
-    # Dash stuff
-    time.sleep(3)
-
+    # Dash UI
     dropDownData = [{'label': x, 'value': x} for x in files]
+    dropDownLog = [{'label': x.name, 'value': x.value} for x in Status]
+    # print(dropDownData)
+    # print(dropDownLog)
     app.layout = html.Div(children=[
-        html.H1(children='Log Graphing'),
+        html.H1(children="Log File Monitoring", style={'textAlign': 'center'}),
+        html.H3(children='Bar Graph'),
 
         html.Label('Files'),
         dcc.Dropdown(
             id="file-choice",
             options=dropDownData,
-            value=files[0]
+            value=files[0],
+            style={'maxWidth': '400px'}
         ),
-
-        html.P(children='''
-            Testing how logs are being graphed.
-        '''),
 
         dcc.Graph(id='log-file-data'),
 
-        html.P(children='''
+        html.H3(children='''
             Pie Chart
         '''),
 
         dcc.Graph(id='log-pie-chart'),
 
-        html.P(children='''
+        html.Label('Log Status'),
+        dcc.Dropdown(
+            id="log-choice",
+            options=dropDownLog,
+            value=Status.WARN.value,
+            style={'maxWidth': '400px'}
+        ),
+
+        html.H3(children='''
             Display table of error and warning logs.
         '''),
 
         dash_table.DataTable(
-            id='table-virtualization',
+            id='live-table',
             data=[],
-            page_action='none'
+            columns=[],
+            style_cell={'textAlign': 'left',
+                        'whiteSpace': 'normal',
+                        'height': 'auto'},
+            style_header={'minWidth': '50px'},
+            page_size=15
         )
     ])
 
@@ -150,7 +156,7 @@ def main():
     @app.callback(
         Output('log-pie-chart', 'figure'),
         Input('file-choice', 'value'))
-    def update_figure(selected_file):
+    def update_pie_chart(selected_file):
         data = dataDict[selected_file]
 
         df = pd.DataFrame({
@@ -165,23 +171,22 @@ def main():
 
         return fig
 
-    # @app.callback(
-    #     [Output("table-virtualization", "data")],
-    #     [Input('file-choice', 'value')])
-    # def updateTable(selected_file):
-    #
-    #     dataError = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_error_logs())]
-    #     # dataWarning = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_warning_logs())]
-    #     # data = [dataError, dataWarning]
-    #     tblrows = dataError.to_dict('columns'),
-    #     tblcols = [{'name': i, 'id': i} for i in data.columns],
-    #
-    #     table = dct.DataTable(
-    #         id='live-table',
-    #         data=tblrows,
-    #         columns=tblcols,
-    #         style_cell={'textAlign': 'center', 'min-width': '50px'}
-    #     )
+    @app.callback(
+        Output("live-table", "data"),
+        Output("live-table", "columns"),
+        Output("live-table", "page_current"),
+        Input('file-choice', 'value'),
+        Input('log-choice', 'value')
+    )
+    def plot_table(selected_file, status):
+        logs = [x for x in dataDict[selected_file].logEntries if x.status.value == status]
+
+        data = pd.DataFrame({'Line #': [x.index for x in logs],
+                             'Log': [x.data for x in logs]})
+
+        return (data.to_dict('records'),
+                [{'name': ix, 'id': ix} for ix in data.columns],
+                0)
 
     app.run_server(debug=True)
 

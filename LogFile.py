@@ -1,4 +1,3 @@
-import time
 import re
 from enum import Enum
 from LogEntry import Status
@@ -25,12 +24,12 @@ class LogFile:
         self.filepath = filepath  # this is just a string
         self._type_of_file()
 
-    def _follow(self, file):
-        while True:
-            line = file.readline()
-            if not line:
-                break
-            yield line
+    # def _follow(self, file):
+    #     while True:
+    #         line = file.readline()
+    #         if not line:
+    #             break
+    #         yield line
 
     def _type_of_file(self):
 
@@ -49,35 +48,22 @@ class LogFile:
         else:
             self.fileType = Type.SYSSTAT
 
-    def monitor_file(self, callback):
-
-        sleep_counter = 0
-
+    def monitor_file(self):
         with open(self.filepath, 'r', encoding="latin-1") as f:
-            for line in self._follow(f):
-                if sleep_counter == 5:
-                    callback(self.logEntries,
-                             self.errorLogs,
-                             self.warningLogs,
-                             self.filepath)
+            for line in f:
+                if (len(self.logEntries) > 0
+                        and self.fileType.value.belongs_prev(line)):
+                    self.logEntries[-1].data += " " + line.strip()
+                    continue
 
-                if line:
-                    if (len(self.logEntries) > 0
-                            and self.fileType.value.belongs_prev(line)):
-                        self.logEntries[-1].data += " " + line.strip()
-                        continue
+                newLog = self.fileType.value(len(self.logEntries), line)
 
-                    newLog = self.fileType.value(len(self.logEntries), line)
+                if newLog.status == Status.WARN:
+                    self.warningLogs.append(len(self.logEntries))
+                elif newLog.status == Status.ERROR:
+                    self.errorLogs.append(len(self.logEntries))
 
-                    if newLog.status == Status.WARN:
-                        self.warningLogs.append(len(self.logEntries))
-                    elif newLog.status == Status.ERROR:
-                        self.errorLogs.append(len(self.logEntries))
+                self.logEntries.append(newLog)
+                # sleep_counter = 0
 
-                    self.logEntries.append(newLog)
-                    sleep_counter = 0
-                else:
-                    sleep_counter += 1
-                    time.sleep(0.1)
-
-        return self.logEntries, self.errorLogs, self.warningLogs
+            return self.logEntries, self.errorLogs, self.warningLogs
