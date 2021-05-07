@@ -165,23 +165,23 @@ def main():
 
         return fig
 
-    @app.callback(
-        [Output("table-virtualization", "data")],
-        [Input('file-choice', 'value')])
-    def updateTable(selected_file):
-
-        dataError = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_error_logs())]
-        # dataWarning = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_warning_logs())]
-        # data = [dataError, dataWarning]
-        tblrows = dataError.to_dict('columns'),
-        tblcols = [{'name': i, 'id': i} for i in data.columns],
-
-        table = dct.DataTable(
-            id='live-table',
-            data=tblrows,
-            columns=tblcols,
-            style_cell={'textAlign': 'center', 'min-width': '50px'}
-        )
+    # @app.callback(
+    #     [Output("table-virtualization", "data")],
+    #     [Input('file-choice', 'value')])
+    # def updateTable(selected_file):
+    #
+    #     dataError = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_error_logs())]
+    #     # dataWarning = [{"id": index, "log": log.data} for index, log in enumerate(dataDict[files[0]].get_warning_logs())]
+    #     # data = [dataError, dataWarning]
+    #     tblrows = dataError.to_dict('columns'),
+    #     tblcols = [{'name': i, 'id': i} for i in data.columns],
+    #
+    #     table = dct.DataTable(
+    #         id='live-table',
+    #         data=tblrows,
+    #         columns=tblcols,
+    #         style_cell={'textAlign': 'center', 'min-width': '50px'}
+    #     )
 
     app.run_server(debug=True)
 
