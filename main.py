@@ -183,9 +183,6 @@ def main():
             style_cell={'textAlign': 'center', 'min-width': '50px'}
         )
 
-
-
-
     app.run_server(debug=True)
 
 
