@@ -6,6 +6,7 @@ import sys
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import dash_table
 from LogEntry import Status
 import plotly.express as px
@@ -16,7 +17,7 @@ from LogFile import LogFile
 
 # Dash setup
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
 # Class Data
@@ -87,39 +88,67 @@ def main():
     dropDownLog = [{'label': x.name, 'value': x.value} for x in Status]
     # print(dropDownData)
     # print(dropDownLog)
-    app.layout = html.Div(children=[
-        html.H1(children="Log File Monitoring", style={'textAlign': 'center'}),
-        html.H3(children='Bar Graph'),
 
-        html.Label('Files'),
-        dcc.Dropdown(
-            id="file-choice",
-            options=dropDownData,
-            value=files[0],
-            style={'maxWidth': '400px'}
-        ),
 
-        dcc.Graph(id='log-file-data'),
+    app.layout = dbc.Container(style={'backgroundColor': '#0077B6'}, children=[
+		dbc.Row([html.H1(children="IBM Preternship Project", style={'textAlign': 'center', 'color' : '#191970'})]),
+        dbc.Row([html.H2(children="Log File Monitoring", style={'textAlign': 'center', 'color': '#FFFFFF'})]),
+        
+        dbc.Row([html.Label(children='Files',style={'color':'#FFFFFF'})]), 
 
-        html.H3(children='''
-            Pie Chart
-        '''),
+		dbc.Row([
+		    dcc.Dropdown(
+                    id="file-choice",
+                    options=dropDownData,
+                    value=files[0],
+					style={'width': '400px'}
+            )
+		]),	
+        
+        dbc.Row([
+			dbc.Col([
+				html.H3(children='Bar Graph'), 
 
-        dcc.Graph(id='log-pie-chart'),
+                dcc.Graph(id='log-file-data')
 
-        html.Label('Log Status'),
-        dcc.Dropdown(
-            id="log-choice",
-            options=dropDownLog,
-            value=Status.WARN.value,
-            style={'maxWidth': '400px'}
-        ),
+				#dash_table.DataTable(
+					#id='stat-table',
+					#data=[],
+					#columns=[],
+					#style_cell={'textAlign': 'left',
+								#'whiteSpace': 'normal',
+								#'height': 'auto'},
+					#)
 
-        html.H3(children='''
+            ], md = 6),
+
+            dbc.Col([
+				    
+                html.H3(children='''
+                    Pie Chart
+                '''),
+
+                dcc.Graph(id='log-pie-chart')   
+				             
+		    ], md = 6),
+
+		]),
+
+		dbc.Row([html.Label('Log Status')]),
+
+		dbc.Row([dcc.Dropdown(
+                    id="log-choice",
+                    options=dropDownLog,
+                    value=Status.WARN.value,
+					style={'width': '400px'}
+			   )
+		]),
+
+        dbc.Row([html.H3(children='''
             Display table of error and warning logs.
-        '''),
+        ''')]),
 
-        dash_table.DataTable(
+        dbc.Row([dash_table.DataTable(
             id='live-table',
             data=[],
             columns=[],
@@ -128,7 +157,7 @@ def main():
                         'height': 'auto'},
             style_header={'minWidth': '50px'},
             page_size=15
-        )
+        )]),
     ])
 
     @app.callback(
@@ -187,6 +216,25 @@ def main():
         return (data.to_dict('records'),
                 [{'name': ix, 'id': ix} for ix in data.columns],
                 0)
+
+
+	
+    #@app.callback(
+        #Output("stat-table", "data"),
+        #Output("stat-table", "columns"),
+        #Input('file-choice', 'value')
+    #)
+    #def status_table(selected_file):
+        #logs = [x for x in dataDict[selected_file].logEntries]
+
+        #data = pd.DataFrame({
+			#"Log Status": ["OK", "Error", "Warning"],
+			#"# of Logs": [(len(data.logEntries)-len(data.errorLogs)-len(data.warningLogs)), len(data.errorLogs), len(data.warningLogs)]})
+
+        #return (data.to_dict('records'),
+				#[{'name': ix, 'id': ix} for ix in data.columns],
+				#0)
+
 
     app.run_server(debug=True)
 
