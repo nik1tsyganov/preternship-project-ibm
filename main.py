@@ -88,13 +88,34 @@ def main():
     dropDownLog = [{'label': x.name, 'value': x.value} for x in Status]
     # print(dropDownData)
     # print(dropDownLog)
+	
+    title_style = {
+		'text-align':'center',
+		'color': '#191970',
+		'font-family':'Courier'
+	}
+
+    subtitle_style = {
+		'color': '#FFFFFF',
+	}
 
 
-    app.layout = dbc.Container(style={'backgroundColor': '#0077B6'}, children=[
-		dbc.Row([html.H1(children="IBM Preternship Project", style={'textAlign': 'center', 'color' : '#191970'})]),
-        dbc.Row([html.H2(children="Log File Monitoring", style={'textAlign': 'center', 'color': '#FFFFFF'})]),
+    main_style = {
+		'backgroundColor' : '#0077B6',
+		'margin-left':'12%',
+		'margin-right':'12%',
+		'padding':'20px 20px'
+	} 
+		
+
+    app.layout = dbc.Container(style=main_style, children=[
+		dbc.Row([html.H1(children="IBM Preternship Project", style=title_style)]),	
+            
+		dbc.Row([html.H2(children="Log File Monitoring", style=title_style)]),
+
+		html.Hr(),
         
-        dbc.Row([html.Label(children='Files',style={'color':'#FFFFFF'})]), 
+        dbc.Row([html.Label(children='Choose a File:',style=subtitle_style)]), 
 
 		dbc.Row([
 		    dcc.Dropdown(
@@ -107,7 +128,7 @@ def main():
         
         dbc.Row([
 			dbc.Col([
-				html.H3(children='Bar Graph'), 
+				html.H3(children='Bar Graph', style=subtitle_style), 
 
                 dcc.Graph(id='log-file-data')
 
@@ -124,9 +145,7 @@ def main():
 
             dbc.Col([
 				    
-                html.H3(children='''
-                    Pie Chart
-                '''),
+                html.H3(children='Pie Chart', style=subtitle_style),
 
                 dcc.Graph(id='log-pie-chart')   
 				             
@@ -134,7 +153,9 @@ def main():
 
 		]),
 
-		dbc.Row([html.Label('Log Status')]),
+		html.Hr(),
+
+		dbc.Row([html.Label('Choose a Log Status:', style=subtitle_style)]),
 
 		dbc.Row([dcc.Dropdown(
                     id="log-choice",
@@ -144,9 +165,7 @@ def main():
 			   )
 		]),
 
-        dbc.Row([html.H3(children='''
-            Display table of error and warning logs.
-        ''')]),
+        dbc.Row([html.H3(children='Display Log Entries for a Given Status', style=subtitle_style)]),
 
         dbc.Row([dash_table.DataTable(
             id='live-table',
