@@ -57,6 +57,9 @@ def main():
     cores = 1
     files = []
 
+    if len(arguments) == 0:
+        usage(1)
+
     while len(arguments) > 0:
         arg = arguments[0]
         if arg == '-c':
@@ -73,7 +76,7 @@ def main():
 
         arguments.pop(0)
 
-    if len(files) > cores:
+    if len(files) > cores or len(files) == 0:
         usage(1)
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=cores) as executor:
@@ -86,90 +89,90 @@ def main():
     # Dash UI
     dropDownData = [{'label': x, 'value': x} for x in files]
     dropDownLog = [{'label': x.name, 'value': x.value} for x in Status]
-    # print(dropDownData)
-    # print(dropDownLog)
-	
+
     title_style = {
-		'text-align':'center',
-		'color': '#191970',
-		'font-family':'Courier'
-	}
+        'text-align': 'center',
+        'color': '#191970',
+        'font-family': 'Courier'
+    }
 
     subtitle_style = {
-		'color': '#FFFFFF',
-	}
-
+        'color': '#FFFFFF',
+    }
 
     main_style = {
-		'backgroundColor' : '#0077B6',
-		'width':'2000px',
-		'margin-left':'10%',
-		'margin-right':'10%',
-		'padding':'20px 20px'
-	} 
-		
+        'backgroundColor': '#0077B6',
+        'width': '2000px',
+        'margin-left': '10%',
+        'margin-right': '10%',
+        'padding': '20px 20px'
+    }
 
     app.layout = dbc.Container(style=main_style, children=[
-		dbc.Row([html.H1(children="IBM Preternship Project", style=title_style)]),	
-            
-		dbc.Row([html.H2(children="Log File Monitoring", style=title_style)]),
+        dbc.Row([html.H1(children="IBM Preternship Project", style=title_style)]),
 
-		html.Hr(),
+        dbc.Row([html.H2(children="Log File Monitoring", style=title_style)]),
 
-		html.Label(children="This display shows the distribution between error and warning logs for a given file.", style=subtitle_style),
+        html.Hr(),
 
-		html.Hr(),
-        
-        dbc.Row([html.H2(children='Choose a File:',style=subtitle_style)]),
-		
-		html.Label(children="All visualizations will be reflective of the logs in the file that you choose.", style=subtitle_style), 
+        html.Label(children="This display shows the distribution between error and warning logs for a given file.",
+                   style=subtitle_style),
 
-		dbc.Row([
-		    dcc.Dropdown(
-                    id="file-choice",
-                    options=dropDownData,
-                    value=files[0],
-					style={'width': '400px'}
-            )
-		]),
-		
-		html.Hr(),	
-        
+        html.Hr(),
+
+        dbc.Row([html.H2(children='Choose a File:', style=subtitle_style)]),
+
+        html.Label(children="All visualizations will be reflective of the logs in the file that you choose.",
+                   style=subtitle_style),
+
         dbc.Row([
-			dbc.Col([
-				html.H3(children='Bar Graph', style=subtitle_style), 
+            dcc.Dropdown(
+                id="file-choice",
+                options=dropDownData,
+                value=files[0],
+                style={'width': '400px'}
+            )
+        ]),
+
+        html.Hr(),
+
+        dbc.Row([
+            dbc.Col([
+                html.H3(children='Bar Graph', style=subtitle_style),
 
                 dcc.Graph(id='log-file-data')
-	
-            ], md = 6),
+
+            ], md=6),
 
             dbc.Col([
-				    
+
                 html.H3(children='Pie Chart', style=subtitle_style),
 
-                dcc.Graph(id='log-pie-chart')   
-				             
-		    ], md = 6),
+                dcc.Graph(id='log-pie-chart')
 
-		]),
+            ], md=6),
 
-		html.Hr(),
+        ]),
 
-		dbc.Row([html.H2('Choose a Log Status:', style=subtitle_style)]),
+        html.Hr(),
 
-		dbc.Row([dcc.Dropdown(
-                    id="log-choice",
-                    options=dropDownLog,
-                    value=Status.WARN.value,
-					style={'width': '400px'}
-			   )
-		]),
+        dbc.Row([html.H2('Choose a Log Status:', style=subtitle_style)]),
 
-		html.Hr(),
+        dbc.Row([dcc.Dropdown(
+            id="log-choice",
+            options=dropDownLog,
+            value=Status.WARN.value,
+            style={'width': '400px'}
+        )
+        ]),
+
+        html.Hr(),
 
         dbc.Row([html.H3(children='Display Log Entries for a Given Status', style=subtitle_style)]),
 
-		html.Label(children='The table shows the log entries for the chosen status along with its corresponding line number within the file', style=subtitle_style),
+        html.Label(
+            children='The table shows the log entries for the chosen status along with its corresponding line number within the file',
+            style=subtitle_style),
 
         dbc.Row([dash_table.DataTable(
             id='live-table',
@@ -239,7 +242,6 @@ def main():
         return (data.to_dict('records'),
                 [{'name': ix, 'id': ix} for ix in data.columns],
                 0)
-   
 
     app.run_server(debug=True)
 
