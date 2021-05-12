@@ -102,8 +102,9 @@ def main():
 
     main_style = {
 		'backgroundColor' : '#0077B6',
-		'margin-left':'12%',
-		'margin-right':'12%',
+		'width':'2000px',
+		'margin-left':'10%',
+		'margin-right':'10%',
 		'padding':'20px 20px'
 	} 
 		
@@ -114,8 +115,14 @@ def main():
 		dbc.Row([html.H2(children="Log File Monitoring", style=title_style)]),
 
 		html.Hr(),
+
+		html.Label(children="This display shows the distribution between error and warning logs for a given file.", style=subtitle_style),
+
+		html.Hr(),
         
-        dbc.Row([html.Label(children='Choose a File:',style=subtitle_style)]), 
+        dbc.Row([html.H2(children='Choose a File:',style=subtitle_style)]),
+		
+		html.Label(children="All visualizations will be reflective of the logs in the file that you choose.", style=subtitle_style), 
 
 		dbc.Row([
 		    dcc.Dropdown(
@@ -124,23 +131,16 @@ def main():
                     value=files[0],
 					style={'width': '400px'}
             )
-		]),	
+		]),
+		
+		html.Hr(),	
         
         dbc.Row([
 			dbc.Col([
 				html.H3(children='Bar Graph', style=subtitle_style), 
 
                 dcc.Graph(id='log-file-data')
-
-				#dash_table.DataTable(
-					#id='stat-table',
-					#data=[],
-					#columns=[],
-					#style_cell={'textAlign': 'left',
-								#'whiteSpace': 'normal',
-								#'height': 'auto'},
-					#)
-
+	
             ], md = 6),
 
             dbc.Col([
@@ -155,7 +155,7 @@ def main():
 
 		html.Hr(),
 
-		dbc.Row([html.Label('Choose a Log Status:', style=subtitle_style)]),
+		dbc.Row([html.H2('Choose a Log Status:', style=subtitle_style)]),
 
 		dbc.Row([dcc.Dropdown(
                     id="log-choice",
@@ -165,7 +165,11 @@ def main():
 			   )
 		]),
 
+		html.Hr(),
+
         dbc.Row([html.H3(children='Display Log Entries for a Given Status', style=subtitle_style)]),
+
+		html.Label(children='The table shows the log entries for the chosen status along with its corresponding line number within the file', style=subtitle_style),
 
         dbc.Row([dash_table.DataTable(
             id='live-table',
@@ -235,25 +239,7 @@ def main():
         return (data.to_dict('records'),
                 [{'name': ix, 'id': ix} for ix in data.columns],
                 0)
-
-
-	
-    #@app.callback(
-        #Output("stat-table", "data"),
-        #Output("stat-table", "columns"),
-        #Input('file-choice', 'value')
-    #)
-    #def status_table(selected_file):
-        #logs = [x for x in dataDict[selected_file].logEntries]
-
-        #data = pd.DataFrame({
-			#"Log Status": ["OK", "Error", "Warning"],
-			#"# of Logs": [(len(data.logEntries)-len(data.errorLogs)-len(data.warningLogs)), len(data.errorLogs), len(data.warningLogs)]})
-
-        #return (data.to_dict('records'),
-				#[{'name': ix, 'id': ix} for ix in data.columns],
-				#0)
-
+   
 
     app.run_server(debug=True)
 
