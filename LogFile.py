@@ -24,13 +24,6 @@ class LogFile:
         self.filepath = filepath  # this is just a string
         self._type_of_file()
 
-    # def _follow(self, file):
-    #     while True:
-    #         line = file.readline()
-    #         if not line:
-    #             break
-    #         yield line
-
     def _type_of_file(self):
 
         topOfFile = ""
@@ -64,6 +57,5 @@ class LogFile:
                     self.errorLogs.append(len(self.logEntries))
 
                 self.logEntries.append(newLog)
-                # sleep_counter = 0
 
             return self.logEntries, self.errorLogs, self.warningLogs
